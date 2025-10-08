@@ -1,0 +1,1 @@
+export const textAction = (value) => ({ type: "change", payload: value });
