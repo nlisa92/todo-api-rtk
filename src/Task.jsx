@@ -5,7 +5,7 @@ import {
   editTask,
   toggleEditMode,
   setEditText,
-} from "./redux/actions/tasksActions";
+} from "./redux/slice/tasksSlice";
 
 const Task = ({ task }) => {
   const dispatch = useDispatch();
@@ -15,7 +15,9 @@ const Task = ({ task }) => {
 
   const handleDownEnter = (e) => {
     if (e.key === "Enter") {
-      dispatch(editTask(currentTask.id, currentTask.editText));
+      dispatch(
+        editTask({ id: currentTask.id, newTitle: currentTask.editText })
+      );
     }
   };
 
@@ -39,7 +41,9 @@ const Task = ({ task }) => {
           className="task-edit-input"
           value={currentTask.editText}
           onChange={(e) =>
-            dispatch(setEditText(currentTask.id, e.target.value))
+            dispatch(
+              setEditText({ taskId: currentTask.id, text: e.target.value })
+            )
           }
           onKeyDown={handleDownEnter}
         />

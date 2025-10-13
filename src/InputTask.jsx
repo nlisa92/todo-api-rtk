@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
-import { textAction } from "./redux/actions/inputActions";
-import { addTask } from "./redux/actions/tasksActions";
+import { change, zero } from "./redux/slice/inputSlice";
+import { addTask } from "./redux/slice/tasksSlice";
 
 function InputTask() {
   const dispatch = useDispatch();
   const { value } = useSelector((store) => store.text);
 
   const handleChange = (e) => {
-    dispatch(textAction(e.target.value));
+    dispatch(change(e.target.value));
   };
 
   const addNewTask = async (value) => {
@@ -17,7 +17,7 @@ function InputTask() {
   const handleClick = () => {
     if (value.trim()) {
       addNewTask(value);
-      dispatch({ type: "zero" });
+      dispatch(zero());
     }
   };
   return (
