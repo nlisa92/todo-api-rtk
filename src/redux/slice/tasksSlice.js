@@ -20,31 +20,29 @@ const tasksSlice = createSlice({
       state.tasks = state.tasks.filter((task) => task.id !== action.payload);
     },
     toggleDone(state, action) {
-      state.tasks = state.tasks.map((task) =>
-        task.id === action.payload ? { ...task, isDone: !task.isDone } : task
-      );
+      const task = state.tasks.find((t) => t.id === action.payload);
+      if (task) task.isDone = !task.isDone;
     },
     editTask(state, action) {
-      state.tasks = state.tasks.map((task) =>
-        task.id === action.payload.id
-          ? { ...task, title: action.payload.newTitle }
-          : task
-      );
+      const { id, newTitle } = action.payload;
+      const task = state.tasks.find((t) => t.id === id);
+      if (task) {
+        task.title = newTitle;
+        task.isEdit = false;
+      }
     },
     toggleEditMode(state, action) {
-      state.tasks = state.tasks.map((task) =>
-        task.id === action.payload
-          ? { ...task, isEdit: !task.isEdit, editText: task.title }
-          : task
-      );
+      const task = state.tasks.find((t) => t.id === action.payload);
+      if (task) {
+        task.isEdit = !task.isEdit;
+        task.editText = task.title;
+      }
     },
 
     setEditText(state, action) {
-      state.tasks = state.tasks.map((task) =>
-        task.id === action.payload.taskId
-          ? { ...task, editText: action.payload.text }
-          : task
-      );
+      const { taskId, text } = action.payload;
+      const task = state.tasks.find((t) => t.id === taskId);
+      if (task) task.editText = text;
     },
   },
 });
