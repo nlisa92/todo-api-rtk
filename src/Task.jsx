@@ -13,7 +13,7 @@ const Task = ({ task }) => {
     state.tasks.tasks.find((t) => t.id === task.id)
   );
 
-  const handleDownEnter = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       dispatch(
         editTask({ id: currentTask.id, newTitle: currentTask.editText })
@@ -21,23 +21,36 @@ const Task = ({ task }) => {
     }
   };
 
-  const handleEditToggle = () => {
+  const handleToggleEdit = () => {
     dispatch(toggleEditMode(currentTask.id));
+  };
+
+  const handleToggleDone = () => {
+    // ✅ передаём объект, как ожидает thunk
+    dispatch(
+      toggleDone({
+        id: currentTask.id,
+        isDone: currentTask.isCompleted, // ⚠️ поле из твоего состояния
+      })
+    );
+  };
+
+  const handleDelete = () => {
+    dispatch(deleteTask(currentTask.id));
   };
 
   return (
     <div className="task-item">
-      <input
-        type="checkbox"
-        checked={currentTask.isDone}
-        onChange={() => dispatch(toggleDone(currentTask.id))}
-      />
       {!currentTask.isEdit ? (
-        <p className={`task-title ${currentTask.isDone ? "active" : ""}`}>
+        <p
+          className={`task-title ${currentTask.isCompleted ? "active" : ""}`}
+          onClick={handleToggleDone}
+        >
           {currentTask.title}
         </p>
       ) : (
         <input
+          autoFocus
           className="task-edit-input"
           value={currentTask.editText}
           onChange={(e) =>
@@ -45,12 +58,13 @@ const Task = ({ task }) => {
               setEditText({ taskId: currentTask.id, text: e.target.value })
             )
           }
-          onKeyDown={handleDownEnter}
+          onKeyDown={handleKeyDown}
         />
       )}
+
       <div className="task-actions">
-        <button onClick={handleEditToggle}>✍</button>
-        <button onClick={() => dispatch(deleteTask(currentTask.id))}>❌</button>
+        <button onClick={handleToggleEdit}>✍</button>
+        <button onClick={handleDelete}>❌</button>
       </div>
     </div>
   );

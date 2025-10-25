@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { change, zero } from "./redux/slice/inputSlice";
-import { addTask } from "./redux/slice/tasksSlice";
+import { createTasks } from "./redux/slice/tasksSlice";
 
 function InputTask() {
   const dispatch = useDispatch();
@@ -10,15 +10,14 @@ function InputTask() {
     dispatch(change(e.target.value));
   };
 
-  const addNewTask = async (value) => {
-    dispatch(addTask(value));
-  };
+  const handleClick = async () => {
+    const trimmed = value.trim();
 
-  const handleClick = () => {
-    if (value.trim()) {
-      addNewTask(value);
-      dispatch(zero());
-    }
+    if (!trimmed) return;
+
+    await dispatch(createTasks(trimmed));
+
+    dispatch(zero());
   };
   return (
     <div className="input-group">

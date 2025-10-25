@@ -3,9 +3,11 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  background-color: #f0f2f5;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen";
 }
 
-/* Общий контейнер */
 .todo-container {
   max-width: 500px;
   margin: 40px auto;
@@ -15,7 +17,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Заголовок */
 .todo-title {
   text-align: center;
   font-size: 24px;
@@ -23,7 +24,6 @@
   color: #333;
 }
 
-/* Инпут и кнопка */
 .input-group {
   display: flex;
   gap: 10px;
@@ -40,7 +40,7 @@
 
 .input-group button {
   padding: 10px 16px;
-  background-color: #4caf50;
+  background-color: #af4ca5;
   color: white;
   border: none;
   border-radius: 8px;
@@ -49,10 +49,9 @@
 }
 
 .input-group button:hover {
-  background-color: #45a049;
+  background-color: #af4ca5;
 }
 
-/* Список задач */
 .task-item {
   display: flex;
   align-items: center;
@@ -62,10 +61,6 @@
   margin-bottom: 10px;
   border-radius: 8px;
   border: 1px solid #ddd;
-}
-
-.task-item input[type="checkbox"] {
-  margin-right: 10px;
 }
 
 .task-title {
