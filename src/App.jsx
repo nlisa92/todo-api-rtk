@@ -21,7 +21,7 @@ function App() {
   const token = useSelector((state) => state.auth.token);
 
   return (
-    <Router>
+    <Router basename="/todo-redux">
       <Layout style={{}}>
         {token && (
           <AntHeader style={{ backgroundColor: "#fefefe" }}>
