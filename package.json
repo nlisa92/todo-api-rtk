@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://nlisa92.github.io/todo-redux",
+  "homepage": "https://nlisa92.github.io/todo-api-rtk/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
