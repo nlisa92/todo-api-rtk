@@ -19,6 +19,13 @@ function InputTask() {
 
     dispatch(zero());
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleClick();
+    }
+  };
   return (
     <div className="input-group">
       <input
@@ -26,6 +33,7 @@ function InputTask() {
         value={value}
         placeholder="What is the task today..."
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
       />
       <button onClick={handleClick}>Add Task</button>
     </div>
