@@ -1,62 +1,54 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   deleteTask,
   toggleDone,
   editTask,
   toggleEditMode,
   setEditText,
+  toggleDoneOptimistic
 } from "./redux/slice/tasksSlice";
 
 const Task = ({ task }) => {
   const dispatch = useDispatch();
-  const currentTask = useSelector((state) =>
-    state.tasks.tasks.find((t) => t.id === task.id)
-  );
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      dispatch(
-        editTask({ id: currentTask.id, newTitle: currentTask.editText })
-      );
+      dispatch(editTask({ id: task.id, newTitle: task.editText }));
     }
   };
 
   const handleToggleEdit = () => {
-    dispatch(toggleEditMode(currentTask.id));
+    dispatch(toggleEditMode(task.id));
   };
 
   const handleToggleDone = () => {
-    // ✅ передаём объект, как ожидает thunk
-    dispatch(
-      toggleDone({
-        id: currentTask.id,
-        isDone: currentTask.isCompleted, // ⚠️ поле из твоего состояния
-      })
-    );
+    // Оптимистично обновляем локальный state
+    dispatch(toggleDoneOptimistic(task.id));
+    // Асинхронно синхронизируем с сервером
+    dispatch(toggleDone({ id: task.id, isDone: task.isCompleted }));
   };
 
   const handleDelete = () => {
-    dispatch(deleteTask(currentTask.id));
+    dispatch(deleteTask(task.id));
   };
 
   return (
     <div className="task-item">
-      {!currentTask.isEdit ? (
+      {!task.isEdit ? (
         <p
-          className={`task-title ${currentTask.isCompleted ? "active" : ""}`}
+          className={`task-title ${task.isCompleted ? "completed" : ""}`}
           onClick={handleToggleDone}
+          style={{ cursor: "pointer", userSelect: "none" }}
         >
-          {currentTask.title}
+          {task.title}
         </p>
       ) : (
         <input
           autoFocus
           className="task-edit-input"
-          value={currentTask.editText}
+          value={task.editText}
           onChange={(e) =>
-            dispatch(
-              setEditText({ taskId: currentTask.id, text: e.target.value })
-            )
+            dispatch(setEditText({ taskId: task.id, text: e.target.value }))
           }
           onKeyDown={handleKeyDown}
         />

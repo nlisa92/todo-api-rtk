@@ -1,25 +1,25 @@
 import { useEffect } from "react";
-import LoggedTask from "./LoggedTask";
 import { useDispatch, useSelector } from "react-redux";
+import LoggedTask from "./LoggedTask";
 import { getTasks } from "./redux/slice/tasksSlice";
 
 const ToDoList = () => {
   const dispatch = useDispatch();
-  const { tasks, status, error } = useSelector((store) => store.tasks);
+  const { tasks, loadingList, error } = useSelector((store) => store.tasks);
 
   useEffect(() => {
     dispatch(getTasks());
-  }, []);
+  }, [dispatch]);
+
+  if (loadingList) return <h2>Loading tasks...</h2>;
+  if (error) return <h2 style={{ color: "red" }}>Error: {error}</h2>;
+  if (tasks.length === 0) return <h2>The task list is empty.</h2>;
+
   return (
     <div className="todo-container">
-      {status === "loading" && <h2>Загрузка задач...</h2>}
-
-      {status === "failed" && <h2 style={{ color: "red" }}>Ошибка: {error}</h2>}
-
-      {status === "succeeded" && tasks.length === 0 && <h1>no tasks</h1>}
-
-      {status === "succeeded" &&
-        tasks.map((item) => <LoggedTask key={item.id} task={item} />)}
+      {tasks.map((task) => (
+        <LoggedTask key={task.id} task={task} />
+      ))}
     </div>
   );
 };

@@ -68,10 +68,10 @@
   font-size: 16px;
   color: #333;
 }
-
-.task-title.active {
+.task-title.completed {
   text-decoration: line-through;
-  color: #aaa;
+  color: gray;
+  opacity: 0.7;
 }
 
 .task-actions button {
