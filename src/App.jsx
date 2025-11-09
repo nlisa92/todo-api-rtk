@@ -3,14 +3,12 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { Layout } from "antd";
-const { Header: AntHeader, Content, Footer: AntFooter } = Layout;
+const { Header: AntHeader, Content } = Layout;
 
-import Header from "./Header";
-import InputTask from "./InputTask";
-import ToDoList from "./TodoList";
-import Login from "./Login";
-import Register from "./Register";
-import Footer from "./Footer";
+import Header from "./layout/Header";
+import TodoPage from "./pages/TodoPage";
+import Login from "./features/auth/components/Login";
+import Register from "./features/auth/components/Register";
 
 function PrivateRoute({ children }) {
   const token = useSelector((state) => state.auth.token);
@@ -37,13 +35,7 @@ function App() {
             path="/todo"
             element={
               <PrivateRoute>
-                <div style={{ maxWidth: 600, margin: "0 auto" }}>
-                  <InputTask />
-                  <ToDoList />
-                  <AntFooter style={{ textAlign: "center" }}>
-                    <Footer />
-                  </AntFooter>
-                </div>
+                <TodoPage />
               </PrivateRoute>
             }
           />

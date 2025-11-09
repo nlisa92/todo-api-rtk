@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LoggedTask from "./LoggedTask";
-import { getTasks } from "./redux/slice/tasksSlice";
+import { getTasks } from "../tasksSlice";
 
 const ToDoList = () => {
   const dispatch = useDispatch();

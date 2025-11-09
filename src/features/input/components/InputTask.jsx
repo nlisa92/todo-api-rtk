@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
-import { change, zero } from "./redux/slice/inputSlice";
-import { createTasks } from "./redux/slice/tasksSlice";
+import { change, zero } from "../inputSlice";
+import { createTasks } from "../../tasks/tasksSlice";
 
 function InputTask() {
   const dispatch = useDispatch();

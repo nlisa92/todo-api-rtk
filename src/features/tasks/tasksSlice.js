@@ -1,18 +1,23 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  isPending,
+  isRejected,
+} from "@reduxjs/toolkit";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const TODOS_URL = import.meta.env.VITE_API_TODOS;
 
 // ==== Thunks ====
-
 export const getTasks = createAsyncThunk(
   "tasks/getTasks",
   async (_, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState();
-      const res = await fetch(
-        "https://todo-redev.herokuapp.com/api/todos?isCompleted=false",
-        {
-          headers: { Authorization: `Bearer ${auth.token}` },
-        }
-      );
+      const res = await fetch(`${BASE_URL}${TODOS_URL}?isCompleted=false`, {
+        headers: { Authorization: `Bearer ${auth.token}` },
+      });
+      if (!res.ok) throw new Error("Ошибка при получении задач");
       const data = await res.json();
       return data;
     } catch (err) {
@@ -26,7 +31,7 @@ export const createTasks = createAsyncThunk(
   async (taskText, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState();
-      const res = await fetch("https://todo-redev.herokuapp.com/api/todos", {
+      const res = await fetch(`${BASE_URL}${TODOS_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,6 +39,7 @@ export const createTasks = createAsyncThunk(
         },
         body: JSON.stringify({ title: taskText }),
       });
+      if (!res.ok) throw new Error("Ошибка при создании задачи");
       const data = await res.json();
       return data;
     } catch (err) {
@@ -47,10 +53,11 @@ export const deleteTask = createAsyncThunk(
   async (id, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState();
-      await fetch(`https://todo-redev.herokuapp.com/api/todos/${id}`, {
+      const res = await fetch(`${BASE_URL}${TODOS_URL}/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${auth.token}` },
       });
+      if (!res.ok) throw new Error("Ошибка при удалении задачи");
       return id;
     } catch (err) {
       return rejectWithValue(err.message);
@@ -63,17 +70,14 @@ export const toggleDone = createAsyncThunk(
   async ({ id, isDone }, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState();
-      const res = await fetch(
-        `https://todo-redev.herokuapp.com/api/todos/${id}/isCompleted`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.token}`,
-          },
-          body: JSON.stringify({ isCompleted: !isDone }),
-        }
-      );
+      const res = await fetch(`${BASE_URL}${TODOS_URL}/${id}/isCompleted`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify({ isCompleted: !isDone }),
+      });
       if (!res.ok) throw new Error("Ошибка при обновлении задачи");
       const updated = await res.json();
       return { id: updated.id, isCompleted: updated.isCompleted };
@@ -84,7 +88,6 @@ export const toggleDone = createAsyncThunk(
 );
 
 // ==== Slice ====
-
 const initialState = {
   tasks: [],
   loadingList: false,
@@ -98,80 +101,65 @@ const tasksSlice = createSlice({
   reducers: {
     editTask(state, action) {
       const { id, newTitle } = action.payload;
-      const t = state.tasks.find((t) => t.id === id);
-      if (t) {
-        t.title = newTitle;
-        t.isEdit = false;
+      const task = state.tasks.find((t) => t.id === id);
+      if (task) {
+        task.title = newTitle;
+        task.isEdit = false;
       }
     },
     toggleEditMode(state, action) {
-      const t = state.tasks.find((t) => t.id === action.payload);
-      if (t) {
-        t.isEdit = !t.isEdit;
-        t.editText = t.title;
+      const task = state.tasks.find((t) => t.id === action.payload);
+      if (task) {
+        task.isEdit = !task.isEdit;
+        task.editText = task.title;
       }
     },
     setEditText(state, action) {
       const { taskId, text } = action.payload;
-      const t = state.tasks.find((t) => t.id === taskId);
-      if (t) t.editText = text;
+      const task = state.tasks.find((t) => t.id === taskId);
+      if (task) task.editText = text;
     },
-    toggleDoneOptimistic: (state, action) => {
-      const t = state.tasks.find((t) => t.id === action.payload);
-      if (t) t.isCompleted = !t.isCompleted;
+    toggleDoneOptimistic(state, action) {
+      const task = state.tasks.find((t) => t.id === action.payload);
+      if (task) task.isCompleted = !task.isCompleted;
     },
   },
   extraReducers: (builder) => {
     builder
-      // ==== getTasks ====
-      .addCase(getTasks.pending, (state) => {
-        state.loadingList = true;
-        state.error = null;
-      })
+      // ==== Fulfilled ====
       .addCase(getTasks.fulfilled, (state, action) => {
         state.loadingList = false;
-        state.tasks.length = 0;
-        state.tasks.push(...action.payload);
-      })
-      .addCase(getTasks.rejected, (state, action) => {
-        state.loadingList = false;
-        state.error = action.payload;
-      })
-
-      // ==== createTasks ====
-      .addCase(createTasks.pending, (state) => {
-        state.loadingMutation = true;
+        state.tasks = action.payload;
       })
       .addCase(createTasks.fulfilled, (state, action) => {
         state.loadingMutation = false;
         state.tasks.unshift(action.payload);
       })
-      .addCase(createTasks.rejected, (state, action) => {
-        state.loadingMutation = false;
-        state.error = action.payload;
-      })
-
-      // ==== deleteTask ====
-      .addCase(deleteTask.pending, (state, action) => {
-        state.loadingMutation = true;
-      })
       .addCase(deleteTask.fulfilled, (state, action) => {
         state.loadingMutation = false;
-        const idx = state.tasks.findIndex((t) => t.id === action.payload);
-        if (idx !== -1) state.tasks.splice(idx, 1);
+        state.tasks = state.tasks.filter((t) => t.id !== action.payload);
       })
-      .addCase(deleteTask.rejected, (state, action) => {
-        state.loadingMutation = false;
-        state.error = action.payload;
-      })
-
-      // ==== toggleDone ====
-
       .addCase(toggleDone.fulfilled, (state, action) => {
-        const { id, isCompleted } = action.payload;
-        const t = state.tasks.find((t) => t.id === id);
-        if (t) t.isCompleted = isCompleted;
-      });
+        const task = state.tasks.find((t) => t.id === action.payload.id);
+        if (task) task.isCompleted = action.payload.isCompleted;
+      })
+      .addMatcher(
+        isPending(getTasks, createTasks, deleteTask),
+        (state, action) => {
+          if (action.type.startsWith("tasks/getTasks"))
+            state.loadingList = true;
+          else state.loadingMutation = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        isRejected(getTasks, createTasks, deleteTask),
+        (state, action) => {
+          state.loadingList = false;
+          state.loadingMutation = false;
+          state.error = action.payload;
+        }
+      );
   },
 });
 

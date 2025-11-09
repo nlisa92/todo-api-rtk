@@ -5,8 +5,8 @@ import {
   editTask,
   toggleEditMode,
   setEditText,
-  toggleDoneOptimistic
-} from "./redux/slice/tasksSlice";
+  toggleDoneOptimistic,
+} from "../tasksSlice";
 
 const Task = ({ task }) => {
   const dispatch = useDispatch();
